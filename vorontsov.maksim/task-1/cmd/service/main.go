@@ -5,15 +5,10 @@ import (
 	"fmt"
 )
 
-func readFloat() (int, error) {
+func readInt() (int, error) {
 	var a int
-
 	_, err := fmt.Scan(&a)
-	if err != nil {
-		return 0, err
-	}
-
-	return a, nil
+	return a, err
 }
 
 func readOperand() (string, error) {
@@ -23,13 +18,7 @@ func readOperand() (string, error) {
 	if err != nil {
 		return "", errors.New("Invalid operation")
 	}
-
-	switch operand {
-	case "+", "-", "*", "/":
-		return operand, nil
-	default:
-		return "", errors.New("Invalid operation")
-	}
+	return operand, nil
 }
 
 func add(a, b int) (int, error) {
@@ -45,15 +34,13 @@ func multiply(a, b int) (int, error) {
 }
 
 func divide(a, b int) (int, error) {
-	if b == 0.0 {
+	if b == 0 {
 		return 0, errors.New("Division by zero")
 	}
 	return a / b, nil
 }
 
 func calculate(a, b int, operand string) (int, error) {
-	var err error
-
 	switch operand {
 	case "+":
 		return add(a, b)
@@ -64,10 +51,8 @@ func calculate(a, b int, operand string) (int, error) {
 	case "/":
 		return divide(a, b)
 	default:
-		err = errors.New("Invalid operation")
+		return 0, errors.New("Invalid operation")
 	}
-
-	return 0, err
 }
 
 func main() {
@@ -75,13 +60,13 @@ func main() {
 	var operation string
 	var err error
 
-	a, err = readFloat()
+	a, err = readInt()
 	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
 
-	b, err = readFloat()
+	b, err = readInt()
 	if err != nil {
 		fmt.Println("Invalid second operand")
 		return
