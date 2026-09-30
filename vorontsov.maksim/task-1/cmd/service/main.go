@@ -5,12 +5,6 @@ import (
 	"fmt"
 )
 
-func readInt() (int, error) {
-	var a int
-	_, err := fmt.Scan(&a)
-	return a, err
-}
-
 func readOperand() (string, error) {
 	var operand string
 
@@ -60,13 +54,13 @@ func main() {
 	var operation string
 	var err error
 
-	a, err = readInt()
+	_, err = fmt.Scan(&a)
 	if err != nil {
 		fmt.Println("Invalid first operand")
 		return
 	}
 
-	b, err = readInt()
+	_, err = fmt.Scan(&b)
 	if err != nil {
 		fmt.Println("Invalid second operand")
 		return
