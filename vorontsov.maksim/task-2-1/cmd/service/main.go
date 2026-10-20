@@ -12,7 +12,7 @@ const (
 func main() {
 	var (
 		numDepartments int
-		numEmployees int
+		numEmployees   int
 	)
 
 	_, err := fmt.Scan(&numDepartments)
@@ -40,7 +40,7 @@ func processDepartment(numEmployees int) bool {
 	minTemp := initMinT
 	maxTemp := initMaxT
 
-	for employeeIndex := range numEmployees {
+	for range numEmployees {
 		var (
 			sign string
 			temp int
@@ -68,25 +68,12 @@ func processDepartment(numEmployees int) bool {
 			return false
 		}
 
-		result := getOptimalTemp(minTemp, maxTemp, sign, employeeIndex == 0)
-		fmt.Println(result)
+		if minTemp > maxTemp {
+			fmt.Println(-1)
+		} else {
+			fmt.Println(minTemp)
+		}
 	}
 
 	return true
-}
-
-func getOptimalTemp(minTemp, maxTemp int, sign string, isFirst bool) int {
-	if minTemp > maxTemp {
-		return -1
-	}
-
-	if isFirst {
-		if sign == ">=" {
-			return minTemp
-		}
-
-		return maxTemp
-	}
-
-	return minTemp
 }
