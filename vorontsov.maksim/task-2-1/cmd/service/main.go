@@ -11,36 +11,36 @@ const (
 
 func main() {
 	var (
-		n int
-		k int
+		numDepartments int
+		numEmployees int
 	)
 
-	_, err := fmt.Scan(&n)
-	if err != nil || n <= 0 {
+	_, err := fmt.Scan(&numDepartments)
+	if err != nil || numDepartments <= 0 {
 		fmt.Println("Invalid number of departments")
 
 		return
 	}
 
-	for range n {
-		_, err = fmt.Scan(&k)
-		if err != nil || k < 0 {
+	for range numDepartments {
+		_, err = fmt.Scan(&numEmployees)
+		if err != nil || numEmployees < 0 {
 			fmt.Println("Invalid number of employees")
 
 			return
 		}
 
-		if !processDepartment(k) {
+		if !processDepartment(numEmployees) {
 			return
 		}
 	}
 }
 
-func processDepartment(k int) bool {
+func processDepartment(numEmployees int) bool {
 	minTemp := initMinT
 	maxTemp := initMaxT
 
-	for j := range k {
+	for employeeIndex := range numEmployees {
 		var (
 			sign string
 			temp int
@@ -68,7 +68,7 @@ func processDepartment(k int) bool {
 			return false
 		}
 
-		result := getOptimalTemp(minTemp, maxTemp, sign, j == 0)
+		result := getOptimalTemp(minTemp, maxTemp, sign, employeeIndex == 0)
 		fmt.Println(result)
 	}
 
