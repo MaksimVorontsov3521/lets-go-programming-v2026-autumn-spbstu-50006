@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -13,6 +14,8 @@ const (
 	signL          = "<="
 	impossibleTemp = -1
 )
+
+var ErrInvalidSign = errors.New("invalid sign")
 
 type TempRange struct {
 	minTemp int
@@ -37,7 +40,7 @@ func (tempRange *TempRange) Update(sign string, temp int) error {
 			tempRange.maxTemp = temp
 		}
 	default:
-		return fmt.Errorf("invalid sign: %s", sign)
+		return fmt.Errorf("%w: %s", ErrInvalidSign, sign)
 	}
 
 	return nil
@@ -54,7 +57,7 @@ func (tempRange *TempRange) GetOptimal() int {
 func processDepartment(numEmployees int, out io.Writer) error {
 	tempRange := NewTempRange()
 
-	for i := 0; i < numEmployees; i++ {
+	for range numEmployees {
 		var (
 			sign string
 			temp int
@@ -69,7 +72,10 @@ func processDepartment(numEmployees int, out io.Writer) error {
 			return err
 		}
 
-		fmt.Fprintln(out, tempRange.GetOptimal())
+		_, err = fmt.Fprintln(out, tempRange.GetOptimal())
+		if err != nil {
+			return fmt.Errorf("failed to write result: %w", err)
+		}
 	}
 
 	return nil
@@ -81,20 +87,23 @@ func main() {
 	_, err := fmt.Scan(&numDepartments)
 	if err != nil || numDepartments <= 0 {
 		fmt.Println("Invalid number of departments")
+
 		return
 	}
 
-	for i := 0; i < numDepartments; i++ {
+	for range numDepartments {
 		var numEmployees int
 
 		_, err = fmt.Scan(&numEmployees)
 		if err != nil || numEmployees < 0 {
 			fmt.Println("Invalid number of employees")
+
 			return
 		}
 
 		if err := processDepartment(numEmployees, os.Stdout); err != nil {
 			fmt.Println(err)
+
 			return
 		}
 	}
