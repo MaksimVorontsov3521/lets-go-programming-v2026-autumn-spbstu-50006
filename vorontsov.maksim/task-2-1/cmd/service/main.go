@@ -2,45 +2,59 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"os"
 )
 
 const (
-	initMinT = 15
-	initMaxT = 30
+	initMinT       = 15
+	initMaxT       = 30
+	signG          = ">="
+	signL          = "<="
+	impossibleTemp = -1
 )
 
-func main() {
-	var (
-		numDepartments int
-		numEmployees   int
-	)
+type TempRange struct {
+	minTemp int
+	maxTemp int
+}
 
-	_, err := fmt.Scan(&numDepartments)
-	if err != nil || numDepartments <= 0 {
-		fmt.Println("Invalid number of departments")
-
-		return
-	}
-
-	for range numDepartments {
-		_, err = fmt.Scan(&numEmployees)
-		if err != nil || numEmployees < 0 {
-			fmt.Println("Invalid number of employees")
-
-			return
-		}
-
-		if !processDepartment(numEmployees) {
-			return
-		}
+func NewTempRange() *TempRange {
+	return &TempRange{
+		minTemp: initMinT,
+		maxTemp: initMaxT,
 	}
 }
 
-func processDepartment(numEmployees int) bool {
-	minTemp := initMinT
-	maxTemp := initMaxT
+func (tempRange *TempRange) Update(sign string, temp int) error {
+	switch sign {
+	case signG:
+		if temp > tempRange.minTemp {
+			tempRange.minTemp = temp
+		}
+	case signL:
+		if temp < tempRange.maxTemp {
+			tempRange.maxTemp = temp
+		}
+	default:
+		return fmt.Errorf("invalid sign: %s", sign)
+	}
 
-	for range numEmployees {
+	return nil
+}
+
+func (tempRange *TempRange) GetOptimal() int {
+	if tempRange.minTemp > tempRange.maxTemp {
+		return impossibleTemp
+	}
+
+	return tempRange.minTemp
+}
+
+func processDepartment(numEmployees int, out io.Writer) error {
+	tempRange := NewTempRange()
+
+	for i := 0; i < numEmployees; i++ {
 		var (
 			sign string
 			temp int
@@ -48,32 +62,40 @@ func processDepartment(numEmployees int) bool {
 
 		_, err := fmt.Scan(&sign, &temp)
 		if err != nil {
-			fmt.Println("Invalid value")
-
-			return false
+			return fmt.Errorf("invalid value: %w", err)
 		}
 
-		switch sign {
-		case ">=":
-			if temp > minTemp {
-				minTemp = temp
-			}
-		case "<=":
-			if temp < maxTemp {
-				maxTemp = temp
-			}
-		default:
-			fmt.Println("Invalid character")
-
-			return false
+		if err := tempRange.Update(sign, temp); err != nil {
+			return err
 		}
 
-		if minTemp > maxTemp {
-			fmt.Println(-1)
-		} else {
-			fmt.Println(minTemp)
-		}
+		fmt.Fprintln(out, tempRange.GetOptimal())
 	}
 
-	return true
+	return nil
+}
+
+func main() {
+	var numDepartments int
+
+	_, err := fmt.Scan(&numDepartments)
+	if err != nil || numDepartments <= 0 {
+		fmt.Println("Invalid number of departments")
+		return
+	}
+
+	for i := 0; i < numDepartments; i++ {
+		var numEmployees int
+
+		_, err = fmt.Scan(&numEmployees)
+		if err != nil || numEmployees < 0 {
+			fmt.Println("Invalid number of employees")
+			return
+		}
+
+		if err := processDepartment(numEmployees, os.Stdout); err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 }
